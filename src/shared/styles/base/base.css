@@ -1,0 +1,15 @@
+:root {
+	--font: 'Inter', sans-serif;
+	--primary: #2c7066;
+	--secondary: #a0d8d0;
+
+	/* --bg-primary: #fafafa;
+	--bg-grey: #cccccc; */
+}
+
+* {
+	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	box-sizing: border-box;
+	scroll-behavior: smooth;
+}
