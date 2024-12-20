@@ -1,15 +1,25 @@
 /** @type {import('tailwindcss').Config} */
+const colors = require('tailwindcss/colors');
+
 export default {
   content: ['./index.html', './src/**/*.{js,ts,jsx,tsx}'],
+
   theme: {
     extend: {
       fontFamily: {
         inter: ['Inter', 'sans-serif'],
       },
       colors: {
-        primary: 'var(--primary)',
-        'primary-alt': 'var(--primary-alt)',
-        secondary: 'var(--secondary)',
+        primary: '#2c7066',
+        'primary-alt': '#074137',
+        secondary: '#a0d8d0',
+      },
+      backgroundSize: {
+        200: '200% 200%',
+      },
+      backgroundPosition: {
+        'pos-0': '0% 0%',
+        'pos-100': '100% 100%',
       },
       fontSize: {
         xxs: ['0.625rem', { lineHeight: '1rem' }],
