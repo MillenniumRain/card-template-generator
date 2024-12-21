@@ -5,8 +5,9 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "start": "vite --port 3000",
     "build": "tsc && vite build",
+    "start": "vite --port 3000",
+    "host": "vite --port 3000 --host",
     "preview": "vite preview"
   },
   "dependencies": {

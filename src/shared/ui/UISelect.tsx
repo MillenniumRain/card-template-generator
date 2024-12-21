@@ -31,10 +31,15 @@ const UISelect: React.FC<UISelectProps> = ({ options, onChange, placeholder, cla
 	return (
 		<div className='relative mb-2'>
 			<div
-				className={cn(`border border-gray-300 bg-white rounded-md py-2 px-3 cursor-pointer `, className)}
+				className={cn(
+					`border border-gray-300 bg-white rounded-md py-2 px-3 cursor-pointer  hover:bg-orange-100 focus:ring-0`,
+					className
+				)}
 				onClick={onSelectClick}>
-				Кол-во слов:{' '}
-				{selectedValue ? options.find((option) => option.value === selectedValue)?.label : placeholder}
+				<span className='mr-2'> Кол-во слов:</span>
+				<span className='text-orange-600'>
+					{selectedValue ? options.find((option) => option.value === selectedValue)?.label : placeholder}
+				</span>
 			</div>
 			{isOpenSelect && (
 				<div
