@@ -13,7 +13,7 @@ const SelectedInput: FC<SelectedInputProp> = ({ className, onSelect, isSelected 
 	return (
 		<div
 			className={cn(
-				`flex relative items-center rounded-md`,
+				`_sinput flex relative items-center rounded-md`,
 				isSelected ? ' outline outline-[2px] outline-orange-600' : null
 			)}>
 			<div className=' '>

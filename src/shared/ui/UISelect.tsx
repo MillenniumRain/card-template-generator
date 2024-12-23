@@ -32,7 +32,7 @@ const UISelect: React.FC<UISelectProps> = ({ options, onChange, placeholder, cla
 		<div className='relative mb-2'>
 			<div
 				className={cn(
-					`border border-gray-300 bg-white rounded-md py-2 px-3 cursor-pointer  hover:bg-orange-100 focus:ring-0`,
+					`_uiselect border border-gray-300 bg-white rounded-md py-2 px-3 cursor-pointer  hover:bg-orange-100 focus:ring-0`,
 					className
 				)}
 				onClick={onSelectClick}>

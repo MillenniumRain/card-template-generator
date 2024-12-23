@@ -6,3 +6,8 @@ export interface iSentence {
 	label: string;
 	active: boolean;
 }
+
+export interface IGeneratedWords {
+	id: string;
+	sentence: string[];
+}

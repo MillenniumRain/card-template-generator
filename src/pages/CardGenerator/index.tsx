@@ -4,54 +4,45 @@ import UIInput from '@/shared/ui/UIInput';
 import UISelect from '@/shared/ui/UISelect';
 import UIButton from '@/shared/ui/UIButton';
 import SelectedInput from '@/pages/CardGenerator/ui/SelectedInput';
-import { iSentence } from '@/pages/CardGenerator/type';
+import { IGeneratedWords, iSentence } from '@/pages/CardGenerator/type';
 import { SS } from '@/pages/CardGenerator/data';
 import { group } from 'console';
+import { data } from 'react-router-dom';
+import Counter from '@/pages/CardGenerator/ui/Counter';
+import useLocalStorage from '@/shared/hooks/LocalStorage';
 
-interface CardGeneratorProp {
-	children?: ReactNode;
-	className?: string;
-}
+interface CardGeneratorProp {}
 
-const CardGenerator: FC<CardGeneratorProp> = ({ className }) => {
+const ALL_COLUMS_NUMBERS = ['2', '1', '0'];
+
+const CardGenerator: FC<CardGeneratorProp> = ({}) => {
 	const [wordCount, setWordCount] = useState('1');
-	const [sentence, setSentence] = useState<iSentence[][]>(JSON.parse(JSON.stringify(SS)));
+	const [counter, setCounter] = useState(5);
+	const [sentence, setSentence] = useState<iSentence[][]>(SS);
+
+	const [localWords, setLocalWords, removeLocal] = useLocalStorage<IGeneratedWords>('gnrt');
+	console.log(localWords);
 
 	const onSelectHandler = (s: iSentence) => {
-		setSentence((prev) => {
-			const sents = [...prev];
-			sents.forEach((sent) => {
-				const word = sent.find((word) => word.id === s.id);
-				if (word) {
-					word.active = !s.active;
-				}
-			});
-			return sents;
-		});
+		setSentence((prev) =>
+			prev.map((group) => group.map((word) => (word.id === s.id ? { ...word, active: !word.active } : word)))
+		);
 	};
 	const onChangeHandler = (column: number, s: iSentence, e: ChangeEvent<HTMLInputElement>) => {
-		setSentence((prev) => {
-			const sents = [...prev];
-			sents[column].forEach((word) => {
-				if (word.id !== s.id) {
-					word.active = false;
-					word.value = '';
-				}
-			});
-			sents.forEach((group) => {
-				const word = group.find((word) => word.id === s.id);
-				if (word) {
-					word.value = e.target.value;
-					word.active = true;
-				}
-			});
-			return sents;
-		});
+		setSentence((prev) =>
+			prev.map((group, index) => {
+				if (index !== column) return group;
+				return group.map((word) =>
+					word.id === s.id
+						? { ...word, value: e.target.value, active: true }
+						: { ...word, active: false, value: '' }
+				);
+			})
+		);
 	};
 
 	const filterSentence = () => {
 		const filtered = [];
-		// const lastFiltered = [];
 		for (const index in sentence) {
 			let withValue = sentence[index].filter((word) => word.value);
 			if (withValue.length == 0) {
@@ -60,17 +51,29 @@ const CardGenerator: FC<CardGeneratorProp> = ({ className }) => {
 			filtered.push(withValue.filter((word) => word.active));
 		}
 
-		console.log(filtered.filter((group) => group.length > 0));
+		console.log({
+			data: filtered
+				.filter((group) => group.length > 0)
+				.map((group) =>
+					group.map((word) => ({
+						type: word.type,
+						value: word.value,
+					}))
+				),
+			count: counter,
+			id: null,
+		});
+		// setLocalWords({ id: '12313', sentence: ['123', 'adad', 'adadaddda'] });
+		// removeLocal();
 	};
 
 	return (
-		<div
+		<main
 			className={cn(
-				'w-screen h-screen grid place-items-center bg-gradient-to-b from-white to-secondary text-primary-alt',
-				className
+				'w-screen h-screen grid place-items-center bg-gradient-to-b from-white to-secondary text-primary-alt'
 			)}>
 			<div className='flex flex-col items-center'>
-				<div className='relative'>
+				<div className='relative text-center'>
 					<div className='absolute -top-[3px] text-6xl font-extrabold bg-gradient-to-tl  from-red-500 to-yellow-400 mb-12 bg-clip-text text-transparent'>
 						Генератор названия карт
 					</div>
@@ -91,68 +94,47 @@ const CardGenerator: FC<CardGeneratorProp> = ({ className }) => {
 								{ label: 'три', value: '3' },
 							]}
 							onChange={(num) => {
-								setSentence(JSON.parse(JSON.stringify(SS)));
+								setSentence(SS);
 								setWordCount(num);
 							}}
 						/>
 					</div>
-					<div className='flex gap-2 mb-8 '>
-						{wordCount > '2' ? (
-							<div className='flex flex-col gap-2'>
-								{sentence[0].map((word, index) => (
-									<SelectedInput
-										onSelect={() => onSelectHandler(word)}
-										key={word.id}
-										isSelected={word.active}
-										placeholder={word.label}
-										onChange={(e) => onChangeHandler(0, word, e)}
-										value={word.value}
-									/>
-								))}
-							</div>
-						) : null}
-						{wordCount > '1' ? (
-							<div className='flex flex-col gap-2'>
-								{sentence[1].map((word, index) => (
-									<SelectedInput
-										onSelect={() => onSelectHandler(word)}
-										key={word.id}
-										isSelected={word.active}
-										placeholder={word.label}
-										onChange={(e) => onChangeHandler(1, word, e)}
-										value={word.value}
-									/>
-								))}
-							</div>
-						) : null}
-						{wordCount > '0' ? (
-							<div className='flex flex-col gap-2'>
-								{sentence[2].map((word, index) => (
-									<SelectedInput
-										onSelect={() => onSelectHandler(word)}
-										key={word.id}
-										isSelected={word.active}
-										placeholder={word.label}
-										onChange={(e) => onChangeHandler(2, word, e)}
-										value={word.value}
-									/>
-								))}
-							</div>
-						) : null}
-					</div>
+					<section className='flex gap-2 mb-8 '>
+						{ALL_COLUMS_NUMBERS.map((column, index) => {
+							if (wordCount <= column) return null;
+							return (
+								<div className='flex flex-col gap-2' key={column}>
+									{sentence[index].map((word) => (
+										<SelectedInput
+											onSelect={() => onSelectHandler(word)}
+											key={word.id}
+											isSelected={word.active}
+											placeholder={word.label}
+											onChange={(e) => onChangeHandler(index, word, e)}
+											value={word.value}
+										/>
+									))}
+								</div>
+							);
+						})}
+					</section>
 					<button
-						className='px-2 py-1 text-sm hover:underline'
+						className='px-2 py-1 text-sm hover:underline text-center'
 						onClick={() => {
-							setSentence(JSON.parse(JSON.stringify(SS)));
+							setSentence(SS);
+							setCounter(1);
 						}}>
 						Сбросить
 					</button>
-					<UIButton className='px-4 py-3 rounded-xl' onClick={filterSentence}>
-						Сгенерировать{' '}
+					<div className='mb-2 justify-center'>
+						<Counter value={counter} onChangeCounter={(counter) => setCounter(counter)} />
+					</div>
+					<UIButton className='rounded-xl px-6 py-3 ' onClick={filterSentence}>
+						Сгенерировать
 					</UIButton>
 				</div>
 			</div>
-		</div>
+		</main>
 	);
 };
 
