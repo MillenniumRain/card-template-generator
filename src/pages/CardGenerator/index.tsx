@@ -10,6 +10,7 @@ import { group } from 'console';
 import { data } from 'react-router-dom';
 import Counter from '@/pages/CardGenerator/ui/Counter';
 import useLocalStorage from '@/shared/hooks/LocalStorage';
+import HistorySideBar from '@/pages/CardGenerator/ui/HistorySideBar';
 
 interface CardGeneratorProp {}
 
@@ -17,11 +18,11 @@ const ALL_COLUMS_NUMBERS = ['2', '1', '0'];
 
 const CardGenerator: FC<CardGeneratorProp> = ({}) => {
 	const [wordCount, setWordCount] = useState('1');
-	const [counter, setCounter] = useState(5);
+	const [counter, setCounter] = useState(1);
 	const [sentence, setSentence] = useState<iSentence[][]>(SS);
+	const [historyIsVisible, setHistoryIsVisible] = useState(false);
 
 	const [localWords, setLocalWords, removeLocal] = useLocalStorage<IGeneratedWords>('gnrt');
-	console.log(localWords);
 
 	const onSelectHandler = (s: iSentence) => {
 		setSentence((prev) =>
@@ -63,14 +64,12 @@ const CardGenerator: FC<CardGeneratorProp> = ({}) => {
 			count: counter,
 			id: null,
 		});
-		// setLocalWords({ id: '12313', sentence: ['123', 'adad', 'adadaddda'] });
-		// removeLocal();
 	};
 
 	return (
 		<main
 			className={cn(
-				'w-screen h-screen grid place-items-center bg-gradient-to-b from-white to-secondary text-primary-alt'
+				'w-full h-full fixed grid place-items-center bg-gradient-to-b from-white to-secondary text-primary-alt overflow-hidden '
 			)}>
 			<div className='flex flex-col items-center'>
 				<div className='relative text-center'>
@@ -132,6 +131,15 @@ const CardGenerator: FC<CardGeneratorProp> = ({}) => {
 					<UIButton className='rounded-xl px-6 py-3 ' onClick={filterSentence}>
 						Сгенерировать
 					</UIButton>
+
+					<div className='absolute top-0 right-0'>
+						<UIButton
+							className='rounded-xl px-6 py-3 bg-none text-orange-600 hover:text-orange-400 font-bold'
+							onClick={() => setHistoryIsVisible(true)}>
+							История
+						</UIButton>
+						<HistorySideBar visible={historyIsVisible} onClick={() => setHistoryIsVisible(false)} />
+					</div>
 				</div>
 			</div>
 		</main>
