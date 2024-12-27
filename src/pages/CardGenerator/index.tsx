@@ -11,6 +11,7 @@ import { data } from 'react-router-dom';
 import Counter from '@/pages/CardGenerator/ui/Counter';
 import useLocalStorage from '@/shared/hooks/LocalStorage';
 import HistorySideBar from '@/pages/CardGenerator/ui/HistorySideBar';
+import { usePostWords } from '@/pages/CardGenerator/hooks/usePostWords.1';
 
 interface CardGeneratorProp {}
 
@@ -21,8 +22,7 @@ const CardGenerator: FC<CardGeneratorProp> = ({}) => {
 	const [counter, setCounter] = useState(1);
 	const [sentence, setSentence] = useState<iSentence[][]>(SS);
 	const [historyIsVisible, setHistoryIsVisible] = useState(false);
-
-	const [localWords, setLocalWords, removeLocal] = useLocalStorage<IGeneratedWords>('gnrt');
+	const { sendWords, data, isSuccess } = usePostWords();
 
 	const onSelectHandler = (s: iSentence) => {
 		setSentence((prev) =>
@@ -42,7 +42,7 @@ const CardGenerator: FC<CardGeneratorProp> = ({}) => {
 		);
 	};
 
-	const filterSentence = () => {
+	const filterAndPostSentence = () => {
 		const filtered = [];
 		for (const index in sentence) {
 			let withValue = sentence[index].filter((word) => word.value);
@@ -51,8 +51,7 @@ const CardGenerator: FC<CardGeneratorProp> = ({}) => {
 			}
 			filtered.push(withValue.filter((word) => word.active));
 		}
-
-		console.log({
+		const data = {
 			data: filtered
 				.filter((group) => group.length > 0)
 				.map((group) =>
@@ -62,8 +61,11 @@ const CardGenerator: FC<CardGeneratorProp> = ({}) => {
 					}))
 				),
 			count: counter,
-			id: null,
-		});
+		};
+		console.log(data);
+
+		sendWords(data);
+		setHistoryIsVisible(true);
 	};
 
 	return (
@@ -73,10 +75,10 @@ const CardGenerator: FC<CardGeneratorProp> = ({}) => {
 			)}>
 			<div className='flex flex-col items-center'>
 				<div className='relative text-center'>
-					<div className='absolute -top-[3px] text-6xl font-extrabold bg-gradient-to-tl  from-red-500 to-yellow-400 mb-12 bg-clip-text text-transparent'>
+					<div className='absolute -top-[3px] text-5xl sm:text-6xl font-extrabold bg-gradient-to-tl  from-red-500 to-yellow-400 mb-12 bg-clip-text text-transparent'>
 						Генератор названия карт
 					</div>
-					<div className='  text-6xl font-extrabold bg-red-500 mb-12 bg-clip-text text-transparent'>
+					<div className='  text-5xl sm:text-6xl font-extrabold bg-red-500 mb-12 bg-clip-text text-transparent'>
 						Генератор названия карт
 					</div>
 				</div>
@@ -98,11 +100,14 @@ const CardGenerator: FC<CardGeneratorProp> = ({}) => {
 							}}
 						/>
 					</div>
-					<section className='flex gap-2 mb-8 '>
+					<section className='flex gap-2 mb-8  flex-wrap justify-center'>
 						{ALL_COLUMS_NUMBERS.map((column, index) => {
 							if (wordCount <= column) return null;
 							return (
 								<div className='flex flex-col gap-2' key={column}>
+									<div className='text-center pb-1 text-sm italic opacity-50 border-b-2 border-black/50'>
+										{/* Слово {index} */}
+									</div>
 									{sentence[index].map((word) => (
 										<SelectedInput
 											onSelect={() => onSelectHandler(word)}
@@ -128,18 +133,23 @@ const CardGenerator: FC<CardGeneratorProp> = ({}) => {
 					<div className='mb-2 justify-center'>
 						<Counter value={counter} onChangeCounter={(counter) => setCounter(counter)} />
 					</div>
-					<UIButton className='rounded-xl px-6 py-3 ' onClick={filterSentence}>
+					<UIButton className='rounded-xl px-6 py-3 ' onClick={filterAndPostSentence}>
 						Сгенерировать
 					</UIButton>
 
 					<div className='absolute top-0 right-0'>
 						<UIButton
-							className='rounded-xl px-6 py-3 bg-none text-orange-600 hover:text-orange-400 font-bold'
+							className='rounded-xl px-6 py-3 bg-none text-orange-600 hover:text-orange-500 font-bold'
 							onClick={() => setHistoryIsVisible(true)}>
 							История
 						</UIButton>
-						<HistorySideBar visible={historyIsVisible} onClick={() => setHistoryIsVisible(false)} />
+						<HistorySideBar
+							lastList={data?.data || []}
+							visible={historyIsVisible}
+							onClick={() => setHistoryIsVisible(false)}
+						/>
 					</div>
+					<div> {isSuccess ? `Сгенрировано слов: ${data.data.length}` : null}</div>
 				</div>
 			</div>
 		</main>
