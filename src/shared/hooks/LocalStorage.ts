@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 
-type IlocalKeys = 'gnrt';
+type IlocalKeys = 'userId';
 
 function useLocalStorage<T>(key: IlocalKeys) {
 	const [storedValue, setStoredValue] = useState<T | null>(getValue);

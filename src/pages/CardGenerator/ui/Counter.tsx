@@ -19,14 +19,15 @@ const Counter: FC<CounterProp> = ({ className, onChangeCounter, value = 0, ...pr
 			</UIButton>
 			<div>
 				<UIInput
-					className='w-8 text-center'
+					className='w-14 text-center'
 					{...props}
 					value={value}
-					onChange={(e) => onChangeCounter(+e.target.value)}
+					onChange={(e) => onChangeCounter(Math.min(+e.target.value, 99))}
+					max='99'
 				/>
 			</div>
 
-			<UIButton className='p-1 ' onClick={() => onChangeCounter(+value + 1)}>
+			<UIButton className='p-1 ' onClick={() => onChangeCounter(Math.min(+value + 1, 99))}>
 				<S_Plus className='text-2xl' stroke='3' />
 			</UIButton>
 		</div>
