@@ -1,11 +1,10 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 
 type IlocalKeys = 'userId';
 
 function useLocalStorage<T>(key: IlocalKeys) {
-	const [storedValue, setStoredValue] = useState<T | null>(getValue);
-
-	function getValue() {
+	const [localUserId, setStoredValue] = useState<T | null>(getValue);
+	function getValue(): T | null {
 		let value = null;
 		try {
 			const data = window.localStorage.getItem(key);
@@ -22,7 +21,7 @@ function useLocalStorage<T>(key: IlocalKeys) {
 			const local = getValue();
 			setStoredValue(local);
 		} catch (error) {
-			new Error('Ошибка в записи  в локальное хранилище');
+			new Error('Ошибка в записи в локальное хранилище');
 		}
 	}
 
@@ -32,10 +31,11 @@ function useLocalStorage<T>(key: IlocalKeys) {
 			const local = getValue();
 			setStoredValue(local);
 		} catch (error) {
-			console.error(error);
+			new Error('Ошибка удалении из локального хранилище');
 		}
 	}
-	return [storedValue, setValue, removeValue] as const;
+
+	return { localUserId, setValue, removeValue, getValue } as const;
 }
 
 export default useLocalStorage;

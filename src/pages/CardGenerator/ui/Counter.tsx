@@ -1,8 +1,8 @@
 import { ReactNode, FC, HTMLInputTypeAttribute, InputHTMLAttributes, useState } from 'react';
 import { cn } from '@/shared/utils/cn';
 import UIInput from '@/shared/ui/UIInput';
-import { S_Minus } from '@/shared/assets/S_Minus';
-import { S_Plus } from '@/shared/assets/S_SVGPlus';
+import { S_Minus } from '@/shared/assets/svg/S_Minus';
+import { S_Plus } from '@/shared/assets/svg/S_SVGPlus';
 import UIButton from '@/shared/ui/UIButton';
 
 interface CounterProp extends InputHTMLAttributes<HTMLInputElement> {

@@ -1,19 +1,24 @@
-import { IPostSentence, IPostWords } from '@/pages/CardGenerator/type';
-import { QueryClient, useMutation, useQueryClient } from '@tanstack/react-query';
-import useLocalStorage from '@/shared/hooks/LocalStorage';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { api } from '@/shared/api/axios';
-import { POST_WORDS_KEY } from '@/pages/CardGenerator/hooks/useListNames';
+import { useContext } from 'react';
+import { LocalStorageContext } from '@/app';
+import { POST_WORDS_KEY } from '@/pages/CardGenerator/queryConstants';
 
-const deleteSentences = async (id: number) => {
-	const response = await api.delete(`/generator/phrases/` + id);
+const deleteSentences = async (userId: string | null, id: number) => {
+	const response = await api.delete(`/generator/phrases/` + id, {
+		params: {
+			user_id: userId,
+		},
+	});
 	return response.data;
 };
 
 export const useDeleteSentences = () => {
 	const queryClient = useQueryClient();
+	const { localUserId: userId } = useContext(LocalStorageContext);
 	const mutaionParams = useMutation({
 		mutationFn: (id: number) => {
-			return deleteSentences(id);
+			return deleteSentences(userId, id);
 		},
 		onSuccess: (data) => {
 			queryClient.invalidateQueries({

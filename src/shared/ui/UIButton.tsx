@@ -13,7 +13,7 @@ const UIButton: FC<UIButtonProps> = ({ children, onClick, className, disabled })
 	return (
 		<button
 			className={clsx(
-				`_button text-emerald-900 bg-200 bg-gradient-to-tl from-pink-500 via-red-500 to-yellow-400   rounded-md bg-pos-0 hover:bg-pos-100 duration-500 font-semibold hover:text-white text-2xl`,
+				`_button text-emerald-900 bg-200 bg-gradient-to-tl from-pink-500 via-red-500 to-yellow-400   rounded-md bg-pos-0 hover:bg-pos-100 duration-500 font-semibold hover:text-white text-2xl disabled:hover:bg-pos-0 disabled:hover:text-emerald-900`,
 				disabled ? 'opacity-50 cursor-not-allowed' : null,
 				className
 			)}

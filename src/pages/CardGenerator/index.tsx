@@ -1,15 +1,12 @@
-import { ReactNode, FC, useState, ChangeEvent } from 'react';
+import { FC, useState, ChangeEvent } from 'react';
 import { cn } from '@/shared/utils/cn';
 import UIInput from '@/shared/ui/UIInput';
 import UISelect from '@/shared/ui/UISelect';
 import UIButton from '@/shared/ui/UIButton';
 import SelectedInput from '@/pages/CardGenerator/ui/SelectedInput';
-import { IGeneratedWords, iSentence } from '@/pages/CardGenerator/type';
+import { iSentence } from '@/pages/CardGenerator/type';
 import { SS } from '@/pages/CardGenerator/data';
-import { group } from 'console';
-import { data } from 'react-router-dom';
 import Counter from '@/pages/CardGenerator/ui/Counter';
-import useLocalStorage from '@/shared/hooks/LocalStorage';
 import HistorySideBar from '@/pages/CardGenerator/ui/HistorySideBar';
 import { usePostWords } from '@/pages/CardGenerator/hooks/usePostWords.1';
 
@@ -22,6 +19,7 @@ const CardGenerator: FC<CardGeneratorProp> = ({}) => {
 	const [counter, setCounter] = useState(1);
 	const [sentence, setSentence] = useState<iSentence[][]>(SS);
 	const [historyIsVisible, setHistoryIsVisible] = useState(false);
+
 	const { sendWords, data, isSuccess } = usePostWords();
 
 	const onSelectHandler = (s: iSentence) => {
@@ -51,7 +49,7 @@ const CardGenerator: FC<CardGeneratorProp> = ({}) => {
 			}
 			filtered.push(withValue.filter((word) => word.active));
 		}
-		const data = {
+		const post = {
 			data: filtered
 				.filter((group) => group.length > 0)
 				.map((group) =>
@@ -62,9 +60,9 @@ const CardGenerator: FC<CardGeneratorProp> = ({}) => {
 				),
 			count: counter,
 		};
-		console.log(data);
 
-		sendWords(data);
+		sendWords(post);
+		// setUserId(data?.id)
 		setHistoryIsVisible(true);
 	};
 
@@ -105,9 +103,7 @@ const CardGenerator: FC<CardGeneratorProp> = ({}) => {
 							if (wordCount <= column) return null;
 							return (
 								<div className='flex flex-col gap-2' key={column}>
-									<div className='text-center pb-1 text-sm italic opacity-50 border-b-2 border-black/50'>
-										{/* Слово {index} */}
-									</div>
+									<div className='text-center pb-1 text-sm italic opacity-50 border-b-2 border-black/50'></div>
 									{sentence[index].map((word) => (
 										<SelectedInput
 											onSelect={() => onSelectHandler(word)}
@@ -133,7 +129,10 @@ const CardGenerator: FC<CardGeneratorProp> = ({}) => {
 					<div className='mb-2 justify-center'>
 						<Counter value={counter} onChangeCounter={(counter) => setCounter(counter)} />
 					</div>
-					<UIButton className='rounded-xl px-6 py-3 ' onClick={filterAndPostSentence}>
+					<UIButton
+						disabled={sentence.find((group) => group.find((word) => word.active)) ? false : true}
+						className='rounded-xl px-6 py-3 '
+						onClick={filterAndPostSentence}>
 						Сгенерировать
 					</UIButton>
 
@@ -149,7 +148,7 @@ const CardGenerator: FC<CardGeneratorProp> = ({}) => {
 							onClick={() => setHistoryIsVisible(false)}
 						/>
 					</div>
-					<div> {isSuccess ? `Сгенрировано слов: ${data.data.length}` : null}</div>
+					<div> {isSuccess ? `Сгенерировано слов: ${data.data.length}` : null}</div>
 				</div>
 			</div>
 		</main>

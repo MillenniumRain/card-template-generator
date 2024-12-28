@@ -1,34 +1,38 @@
+import { LocalStorageContext } from '@/app';
+import { POST_WORDS_KEY } from '@/pages/CardGenerator/queryConstants';
 import { IListNames } from '@/pages/CardGenerator/type';
 import { api } from '@/shared/api/axios';
-import useLocalStorage from '@/shared/hooks/LocalStorage';
 import { useQuery } from '@tanstack/react-query';
-import { useEffect, useRef, useState } from 'react';
+import { useRef, useContext } from 'react';
 
-const getListNames = async (userId: string, currentPage: number, limit: number) => {
-	return api.get<IListNames>('/generator/phrases/', {
-		params: {
-			limit,
-			offset: (currentPage - 1) * limit,
-			user_id: userId,
-		},
-	});
+const getListNames = async (userId: string | null, currentPage: number, limit: number) => {
+	try {
+		return await api.get<IListNames>('/generator/phrases/', {
+			params: {
+				limit,
+				offset: (currentPage - 1) * limit,
+				user_id: userId,
+			},
+		});
+	} catch (error) {
+		return { data: { results: [], count: 0 } };
+	}
 };
-export const POST_WORDS_KEY = 'generatedListNames';
 
 export const useListNames = (currentPage: number = 1, limit: number = 20) => {
 	let maxPage = useRef(1);
-	const [userId] = useLocalStorage<string>('userId');
+	const { localUserId: id } = useContext(LocalStorageContext);
+
 	const response = useQuery({
-		queryKey: [POST_WORDS_KEY, currentPage],
-		queryFn: () => getListNames(userId || '', currentPage, limit),
+		queryKey: [POST_WORDS_KEY, currentPage, id],
+		queryFn: () => getListNames(id, currentPage, limit),
 		select: (response) => response.data,
 	});
 	if (response.isError) {
-		console.error('Error', response.isError);
 	}
 
 	if (response.isSuccess) {
 		maxPage.current = Math.ceil(response.data.count / limit);
 	}
-	return { ...response, maxPage: maxPage.current };
+	return { ...response, maxPage: maxPage.current, limit };
 };
