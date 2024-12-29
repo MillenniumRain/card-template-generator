@@ -15,11 +15,11 @@ const getListNames = async (userId: string | null, currentPage: number, limit: n
 			},
 		});
 	} catch (error) {
-		return { data: { results: [], count: 0 } };
+		return { data: { results: [], count: 0, id: '', next: null, previous: null } };
 	}
 };
 
-export const useListNames = (currentPage: number = 1, limit: number = 20) => {
+export const useGetListNames = (currentPage: number = 1, limit: number = 20) => {
 	let maxPage = useRef(1);
 	const { localUserId: id } = useContext(LocalStorageContext);
 
@@ -30,9 +30,12 @@ export const useListNames = (currentPage: number = 1, limit: number = 20) => {
 	});
 	if (response.isError) {
 	}
-
+	const uData = useRef(response.data);
 	if (response.isSuccess) {
+		if (response.data?.results.length) {
+			uData.current = response.data;
+		}
 		maxPage.current = Math.ceil(response.data.count / limit);
 	}
-	return { ...response, maxPage: maxPage.current, limit };
+	return { ...response, maxPage: maxPage.current, limit, data: uData.current };
 };

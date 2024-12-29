@@ -1,7 +1,7 @@
-import { ReactNode, FC, useState, useEffect } from 'react';
+import { ReactNode, FC, useState, useEffect, useRef } from 'react';
 import { cn } from '@/shared/utils/cn';
 import { S_Plus } from '@/shared/assets/svg/S_SVGPlus';
-import { useListNames } from '@/pages/CardGenerator/hooks/useListNames';
+import { useGetListNames } from '@/pages/CardGenerator/hooks/useGetListNames';
 import { S_Bucket } from '@/shared/assets/svg/S_Bucket';
 import { useDeleteSentences } from '@/pages/CardGenerator/hooks/useDeleteSentences';
 import { IPostWordsResponse } from '@/pages/CardGenerator/type';
@@ -16,7 +16,8 @@ interface HistorySideBarProp {
 
 const HistorySideBar: FC<HistorySideBarProp> = ({ className, visible, onClick, lastList }) => {
 	const [currentPage, setCurrentPage] = useState(1);
-	const { data, maxPage, limit } = useListNames(currentPage);
+	const { data, maxPage, limit } = useGetListNames(currentPage);
+
 	const { deleteSentences } = useDeleteSentences();
 	return (
 		<div
@@ -35,7 +36,7 @@ const HistorySideBar: FC<HistorySideBarProp> = ({ className, visible, onClick, l
 			<div className='_history flex-1  overflow-hidden bg-white '>
 				<div className='w-full h-full  text-stone-900 bg-stone-900 overflow-y-auto flex flex-col gap-1 py-1'>
 					{data?.results?.length ? (
-						data?.results.map((sentence, index) => (
+						data.results.map((sentence, index) => (
 							<div
 								className={cn(
 									`_sentence flex gap-2 group  cursor-default bg-white  hover:text-white hover:bg-transparent py-1 border-l-4 border-stone-900  hover:border-l-orange-600`,
